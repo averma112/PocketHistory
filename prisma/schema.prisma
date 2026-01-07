@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Expense {
+  id               String   @id @default(cuid())
+
+  // base currency amount
+  amountBase       Float
+  baseCurrency     String
+
+  // optional original currency 
+  originalAmount   Float?
+  originalCurrency String?
+  fxRate           Float?
+  fxDate           DateTime?
+
+  category         String
+  note             String?
+  date             DateTime
+  createdAt        DateTime @default(now())
+}
+
+
+
+model Habit {
+  id        String       @id @default(cuid())
+  name      String
+  createdAt DateTime     @default(now())
+  entries   HabitEntry[]
+}
+
+model HabitEntry {
+  id      String  @id @default(cuid())
+  date    String
+  done    Boolean @default(true)
+  habitId String
+  habit   Habit   @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  @@unique([habitId, date])
+}
