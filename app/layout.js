@@ -1,15 +1,15 @@
-import './globals.css'
+'use client'
 
-export const metadata = {
-  title: 'PocketHistory',
-  description: 'Track. Reflect. Grow.',
-}
+import './globals.css'
+import { SessionProvider } from 'next-auth/react'
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#070B14] text-white antialiased">
-        <main className="max-w-6xl mx-auto p-4 sm:p-6">{children}</main>
+        <SessionProvider>
+          <main className="max-w-6xl mx-auto p-4 sm:p-6">{children}</main>
+        </SessionProvider>
       </body>
     </html>
   )
