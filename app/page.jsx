@@ -21,27 +21,8 @@ import { useMemo } from 'react'
 export default function Page() {
   const { data: session, status } = useSession()
   const router = useRouter()
-
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login')
-    }
-  }, [status, router])
-
   const { data: res, mutate, isLoading, error } = useSWR('/api/expenses', getExpenses)
   const items = res?.items || []
-
-  if (status === 'loading') {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#070B14] text-white">
-        <div>Loading...</div>
-      </div>
-    )
-  }
-
-  if (!session) {
-    return null
-  }
 
   // ✅ derive everything from SWR response (always realtime)
   const { total, avgPerDay, safeToSpend } = useMemo(() => {
@@ -64,6 +45,24 @@ export default function Page() {
     // optional: safeToSpend if you have budget later; keep null for now
     return { total: sum, avgPerDay: avg, safeToSpend: null }
   }, [items])
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    }
+  }, [status, router])
+
+  if (status === 'loading') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#070B14] text-white">
+        <div>Loading...</div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-[#070B14] text-white">
