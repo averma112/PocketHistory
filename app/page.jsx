@@ -1,5 +1,8 @@
 'use client'
 
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import DashboardStats from '@/components/DashboardStats'
@@ -16,8 +19,29 @@ import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
 export default function Page() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    }
+  }, [status, router])
+
   const { data: res, mutate, isLoading, error } = useSWR('/api/expenses', getExpenses)
   const items = res?.items || []
+
+  if (status === 'loading') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#070B14] text-white">
+        <div>Loading...</div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return null
+  }
 
   // ✅ derive everything from SWR response (always realtime)
   const { total, avgPerDay, safeToSpend } = useMemo(() => {
