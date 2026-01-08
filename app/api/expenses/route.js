@@ -1,9 +1,24 @@
 import { prisma } from '@/lib/prisma'
 import { getFxRate } from '@/lib/fx'
+import { getServerSession } from 'next-auth'
 
 export async function GET() {
   try {
+    const session = await getServerSession()
+    if (!session?.user?.email) {
+      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    })
+
+    if (!user) {
+      return Response.json({ ok: false, error: 'User not found' }, { status: 404 })
+    }
+
     const items = await prisma.expense.findMany({
+      where: { userId: user.id },
       orderBy: { date: 'desc' },
       take: 200,
     })
@@ -15,6 +30,19 @@ export async function GET() {
 
 export async function POST(req) {
   try {
+    const session = await getServerSession()
+    if (!session?.user?.email) {
+      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    })
+
+    if (!user) {
+      return Response.json({ ok: false, error: 'User not found' }, { status: 404 })
+    }
+
     const body = await req.json()
 
     const amount = Number(body.amount)
@@ -51,6 +79,7 @@ export async function POST(req) {
 
     const created = await prisma.expense.create({
       data: {
+        userId: user.id,
         category,
         note,
         date,
