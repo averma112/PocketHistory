@@ -2,6 +2,9 @@ import { prisma } from '@/lib/prisma'
 import { getFxRate } from '@/lib/fx'
 import { getServerSession } from 'next-auth'
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const session = await getServerSession()

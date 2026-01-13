@@ -4,6 +4,9 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 import { prisma } from "@/lib/prisma"
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 const handler = NextAuth({
   providers: [
     GoogleProvider({

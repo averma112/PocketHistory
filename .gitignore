@@ -21,7 +21,8 @@ build/
 .env
 .env.*
 !.env.example
-
+Resume.pdf
+node-v24.12.0.pkg
 # =========================
 # Prisma
 # =========================
