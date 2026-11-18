@@ -1,23 +1,15 @@
 import { prisma } from '@/lib/prisma'
 import { getFxRate } from '@/lib/fx'
-import { getServerSession } from 'next-auth'
+import { getCurrentUser } from '@/lib/current-user'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const session = await getServerSession()
-    if (!session?.user?.email) {
-      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    })
-
+    const user = await getCurrentUser()
     if (!user) {
-      return Response.json({ ok: false, error: 'User not found' }, { status: 404 })
+      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const items = await prisma.expense.findMany({
@@ -33,17 +25,9 @@ export async function GET() {
 
 export async function POST(req) {
   try {
-    const session = await getServerSession()
-    if (!session?.user?.email) {
-      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    })
-
+    const user = await getCurrentUser()
     if (!user) {
-      return Response.json({ ok: false, error: 'User not found' }, { status: 404 })
+      return Response.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await req.json()
